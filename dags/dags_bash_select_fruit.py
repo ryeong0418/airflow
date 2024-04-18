@@ -5,7 +5,7 @@ from airflow.operators.bash import BashOperator
 
 with DAG(
     dag_id = "dags_bah_select_fruit",
-    schedulr = "10 0 * * 6#1", #매월 첫 번째 주 토요일 0시10분
+    schedule = "10 0 * * 6#1", #매월 첫 번째 주 토요일 0시10분
     start_date = pendulum.datetime(2023,3,1,tz="Asia/Seoul"),
     catchup = False
 ) as dag:
