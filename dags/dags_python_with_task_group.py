@@ -9,7 +9,7 @@ from airflow.utils.task_group import TaskGroup
 with DAG(
     dag_id='dags_python_with_task_group',
     schedule=None,
-    start_date=pendulum.datetime(2023,4,1,tz='Aisa/Seoul'),
+    start_date=pendulum.datetime(2023,4,1,tz='Asia/Seoul'),
     catchup=False
 ) as dag:
     def inner_func(**kwargs):
