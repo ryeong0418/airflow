@@ -36,7 +36,7 @@ class SeoulApiToCsvOperator(BaseOperator):
                 start_row = end_row + 1
                 end_row +=1000
 
-        if not os.path.exist(self.path):
+        if not os.path.exists(self.path):
             os.system(f'mkdir -p {self.path}')
 
         total_row_df.to_csv(self.path+'/'+self.file_name, encoding='utf-8', index=False)
@@ -52,7 +52,6 @@ class SeoulApiToCsvOperator(BaseOperator):
         request_url = f'{base_url}/{start_row}/{end_row}'
         if self.base_dt is not None:
             request_url = f'{base_url}/{start_row}/{end_row}/{self.base_dt}'
-
         response = requests.get(request_url, headers)
         contents = json.loads(response.text)
 
