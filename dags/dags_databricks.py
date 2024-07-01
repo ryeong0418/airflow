@@ -9,12 +9,10 @@ default_args = {
     'depends_on_past': False,
     'email_on_failure': False,
     'email_on_retry': False,
-    'retries': 1,
-    'retry_delay': timedelta(minutes=5),
 }
 
 with DAG(
-    'dags_databricks',
+    dag_id='dags_databricks',
     default_args=default_args,
     description='A simple DAG to run a Databricks job',
     schedule_interval=None,
