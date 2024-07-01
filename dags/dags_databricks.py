@@ -1,16 +1,25 @@
 from airflow import DAG
+import pendulum
+from datetime import datetime
 from airflow.providers.databricks.operators.databricks import DatabricksRunNowOperator
 from airflow.utils.dates import days_ago
 
 default_args = {
-    'owner' : 'airflow'
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+    'retry_delay': datetime.timedelta(minutes=5),
 }
 
 with DAG(
-    dag_id='dags_databricks',
-    start_date=days_ago(2),
+    'dags_databricks',
+    default_args=default_args,
+    description='A simple DAG to run a Databricks job',
     schedule_interval=None,
-    default_args = default_args
+    start_date=datetime(2024, 1, 1),
+    catchup=False,
 ) as dag:
 
     opr_run_now = DatabricksRunNowOperator(
