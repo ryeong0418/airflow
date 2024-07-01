@@ -1,6 +1,6 @@
 from airflow import DAG
 import pendulum
-from datetime import datetime
+from datetime import datetime, timedelta
 from airflow.providers.databricks.operators.databricks import DatabricksRunNowOperator
 from airflow.utils.dates import days_ago
 
@@ -10,7 +10,7 @@ default_args = {
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
-    'retry_delay': datetime.timedelta(minutes=5),
+    'retry_delay': timedelta(minutes=5),
 }
 
 with DAG(
