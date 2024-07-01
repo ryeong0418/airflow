@@ -7,6 +7,7 @@ default_args = {
 }
 
 with DAG(
+    dag_id='dags_databricks',
     start_date=days_ago(2),
     schedule_interval=None,
     default_args = default_args
