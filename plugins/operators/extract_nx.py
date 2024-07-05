@@ -3,11 +3,8 @@ import requests
 from pprint import pprint
 from datetime import datetime
 from airflow.models.baseoperator import BaseOperator
-import os
 import json
 from dotenv import load_dotenv
-
-load_dotenv()  # .env 파일에서 환경 변수 로드
 
 
 class ExtractNxOperator(BaseOperator):
@@ -19,6 +16,15 @@ class ExtractNxOperator(BaseOperator):
         self.FILE_PATH = file_path
 
     def execute(self, context):
+
+        # 디버그 출력 추가
+        print(f"API_KEY: {self.API_KEY}")
+        print(f"URI: {self.URI}")
+        print(f"FILE_PATH: {self.FILE_PATH}")
+
+        if not self.URI:
+            raise ValueError("URI가 설정되지 않았습니다.")
+
         headers = {'x-nxopen-api-key': self.API_KEY}
         result = requests.get(self.URI, headers=headers)
         raw_data = result.json()
