@@ -37,7 +37,7 @@ with DAG(
     # )
 
     nx_info = SimpleHttpOperator(
-        task_id='nx',
+        task_id='nx_info',
         http_conn_id='nx_api',
         endpoint='https://open.api.nexon.com/maplestory/v1/ranking/overall?date=2024-05-01',
         method='GET',
@@ -48,7 +48,7 @@ with DAG(
     @task(task_id='python_2')
     def python_2(**kwargs):
         ti = kwargs['ti']
-        rslt = ti.xcom_pull(task_ids='nx')
+        rslt = ti.xcom_pull(task_ids='nx_info')
         import json
         from pprint import pprint
 
