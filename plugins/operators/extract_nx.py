@@ -5,6 +5,7 @@ from datetime import datetime
 from airflow.models.baseoperator import BaseOperator
 import json
 from dotenv import load_dotenv
+import logging
 
 
 class ExtractNxOperator(BaseOperator):
@@ -17,25 +18,31 @@ class ExtractNxOperator(BaseOperator):
 
     def execute(self, context):
 
-        # 디버그 출력 추가
-        print(f"API_KEY: {self.API_KEY}")
-        print(f"URI: {self.URI}")
-        print(f"FILE_PATH: {self.FILE_PATH}")
+        # Logging for debugging
+        logging.info(f"API_KEY: {self.API_KEY}")
+        logging.info(f"URI: {self.URI}")
+        logging.info(f"FILE_PATH: {self.FILE_PATH}")
 
         if not self.URI:
             raise ValueError("URI가 설정되지 않았습니다.")
 
         headers = {'x-nxopen-api-key': self.API_KEY}
-        result = requests.get(self.URI, headers=headers)
-        raw_data = result.json()
-        pprint(raw_data)
+        try:
+            response = requests.get(self.URI, headers=headers)
+            response.raise_for_status()
+            raw_data = response.json()
+            pprint(raw_data)
 
-        with open(self.FILE_PATH, 'w', encoding='utf-8') as f:
-            json.dump(raw_data, f, ensure_ascii=False, indent=4)
+            # Save the data to a JSON file
+            with open(self.FILE_PATH, 'w', encoding='utf-8') as f:
+                json.dump(raw_data, f, ensure_ascii=False, indent=4)
 
-        print("JSON 데이터가 'raw_data.json' 파일에 저장되었습니다.")
+            logging.info(f"JSON data has been saved to {self.FILE_PATH}.")
+            return raw_data
 
-        return raw_data
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Request failed: {e}")
+            raise
 
 
     # def load_data(self):
