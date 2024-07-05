@@ -5,11 +5,15 @@ from airflow.decorators import task
 from datetime import datetime, timedelta
 import pendulum
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def generate_url(execution_date):
     created_url = f"{os.getenv('MAP_URI')}?date={execution_date.strftime('%Y-%m-%d')}"
     return created_url
+
 
 with DAG(
     dag_id='dags_extract_nx',
