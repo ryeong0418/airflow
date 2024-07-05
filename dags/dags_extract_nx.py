@@ -18,36 +18,35 @@ default_args = {
 }
 
 
-def fetch_data(**kwargs):
+def fetch_data(execution_date, **kwargs):
     api_key = os.getenv('API_KEY')
-    date_str = kwargs['execution_date'].strftime('%Y-%m-%d')
-    file_date_str = kwargs['execution_date'].strftime('%m%d')
+    date_str = execution_date.strftime('%Y-%m-%d')
+    file_date_str = execution_date.strftime('%m%d')
     url = f'https://open.api.nexon.com/maplestory/v1/ranking/overall?date={date_str}'
     headers = {'x-nxopen-api-key': api_key}
 
     result = requests.get(url, headers=headers)
     if result.status_code == 200:
         data = result.json()
+        os.makedirs('/path/to/save', exist_ok=True)
         with open(f'/path/to/save/{file_date_str}.json', 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
         print(f'Successfully saved data for {date_str} to {file_date_str}.json')
     else:
         print(f'Failed to fetch data for {date_str}: {result.status_code}')
 
-
 dag = DAG(
     dag_id='dags_extract_nx',
     default_args=default_args,
     description='Fetch MapleStory data daily and save as JSON',
-    schedule_interval=timedelta(minutes=1),
+    schedule_interval=timedelta(days=1),
 )
 
 for i in range(31):
     date = datetime(2024, 5, 1) + timedelta(days=i)
     task = PythonOperator(
         task_id=f'fetch_data_{date.strftime("%m%d")}',
-        provide_context=True,
         python_callable=fetch_data,
+        op_kwargs={'execution_date': date},
         dag=dag,
-        execution_date=date
     )
