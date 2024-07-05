@@ -1,56 +1,53 @@
 from airflow import DAG
-from airflow.providers.http.operators.http import SimpleHttpOperator
 from airflow.operators.python import PythonOperator
-from airflow.decorators import task
 from datetime import datetime, timedelta
-import pendulum
+import requests
+import json
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()  # .env 파일에서 환경 변수 로드
 
 
-def generate_url(execution_date):
-    created_url = f"{os.getenv('MAP_URI')}?date={execution_date.strftime('%Y-%m-%d')}"
-    return created_url
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'start_date': datetime(2024, 5, 1),
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
+}
 
 
-with DAG(
+def fetch_data(**kwargs):
+    api_key = os.getenv('API_KEY')
+    date_str = kwargs['execution_date'].strftime('%Y-%m-%d')
+    file_date_str = kwargs['execution_date'].strftime('%m%d')
+    url = f'https://open.api.nexon.com/maplestory/v1/ranking/overall?date={date_str}'
+    headers = {'x-nxopen-api-key': api_key}
+
+    result = requests.get(url, headers=headers)
+    if result.status_code == 200:
+        data = result.json()
+        with open(f'/path/to/save/{file_date_str}.json', 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+        print(f'Successfully saved data for {date_str} to {file_date_str}.json')
+    else:
+        print(f'Failed to fetch data for {date_str}: {result.status_code}')
+
+
+dag = DAG(
     dag_id='dags_extract_nx',
-    start_date=pendulum.datetime(2024, 5, 1, tz='Asia/Seoul'),
-    end_date=pendulum.datetime(2024, 6, 1, tz='Asia/Seoul'),
-    catchup=False,
-    schedule_interval=timedelta(minutes=10)
-) as dag:
+    default_args=default_args,
+    description='Fetch MapleStory data daily and save as JSON',
+    schedule_interval=timedelta(minutes=1),
+)
 
-    def generate_url_task(**kwargs):
-        ti = kwargs['ti']
-        execution_date = kwargs['execution_date']
-        url = generate_url(execution_date)
-        ti.xcom_push(key='url', value=url)
-
-    generate_url_operator = PythonOperator(
-        task_id='generate_url_task',
-        python_callable=generate_url_task,
+for i in range(31):
+    date = datetime(2024, 5, 1) + timedelta(days=i)
+    task = PythonOperator(
+        task_id=f'fetch_data_{date.strftime("%m%d")}',
         provide_context=True,
+        python_callable=fetch_data,
         dag=dag,
+        execution_date=date
     )
-
-    nx_info = SimpleHttpOperator(
-        task_id='nx_info',
-        http_conn_id='nx_api',
-        endpoint="{{ ti.xcom_pull(task_ids='generate_url_task', key='url') }}",
-        method='GET',
-        headers={'x-nxopen-api-key': os.getenv('API_KEY')},
-    )
-
-    @task(task_id='python_2')
-    def python_2(**kwargs):
-        ti = kwargs['ti']
-        rslt = ti.xcom_pull(task_ids='nx_info')
-        import json
-        from pprint import pprint
-
-        pprint(json.loads(rslt))
-
-    generate_url_operator >> nx_info >> python_2()
