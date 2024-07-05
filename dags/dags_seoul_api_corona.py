@@ -45,3 +45,5 @@ with DAG(
     create_tb_corona19_count_status_directory() >> tb_corona19_count_status
     create_tv_corona19_vaccine_stat_new_directory() >> tv_corona19_vaccine_stat_new
     tb_corona19_count_status >> tv_corona19_vaccine_stat_new
+
+
