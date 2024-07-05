@@ -1,6 +1,6 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from plugins.operators.extract_nx import ExtractNxOperator
+from operators.extract_nx import ExtractNxOperator
 from datetime import datetime, timedelta
 import requests
 import json
