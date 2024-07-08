@@ -6,7 +6,7 @@ import logging
 import requests
 from airflow.models import Variable
 import json
-
+import os
 
 class NxApiToJsonOperator(BaseOperator):
 
@@ -17,18 +17,10 @@ class NxApiToJsonOperator(BaseOperator):
 
     def execute(self, context):
 
-        # Logging for debugging
-        logging.info(f"conn_id: {self.http_conn_id}")
-        logging.info(f"endpoint: {self.endpoint}")
-
         connection = BaseHook.get_connection(self.http_conn_id)
         logging.info(f"connection:{connection}")
-
         self.URI = f'{connection.host}{self.endpoint}'
 
-        logging.info(f"URL: {self.URI}")
-
-        #headers = {'x-nxopen-api-key': '{{var.value.apikey_openapi_nx}}'}
         api_key = Variable.get("apikey_openapi_nx")
         headers = {'x-nxopen-api-key': api_key}
 
@@ -36,6 +28,12 @@ class NxApiToJsonOperator(BaseOperator):
         raw_data = result.json()
         pprint(raw_data)
 
+        file_path = 'C:/Users/seoryeong/Desktop/folder/nx_code.json'
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(raw_data, f, ensure_ascii=False, indent=4)
+        logging.info(f"JSON 데이터가 '{file_path}' 파일에 저장되었습니다.")
+
         return raw_data
+
 
 
