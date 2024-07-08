@@ -11,17 +11,15 @@ with DAG(
     schedule=None
 ) as dag:
 
-    '''서울시 공공 자전거 대여소 정보'''
-
     nx_info = SimpleHttpOperator(
         task_id='nx_info',
         http_conn_id='nx_api',
         endpoint='{{var.value.apikey_openapi_nx}}/maplestory/v1/ranking/overall?date=2024-05-01',
         method='GET',
-        headers={'Content-Type':'application/json',
-                 'charset':'utf-8',
-                 'Accept':'*/*'
-        }
+        headers={'x-nxopen-api-key': '{{ var.value.apikey_openapi_nx }}'},
+        response_filter=lambda response: response.json(),
+        log_response=True
+
     )
 
     @task(task_id='python_2')
