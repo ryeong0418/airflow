@@ -31,6 +31,7 @@ class NxApiToJsonOperator(BaseOperator):
 
         logging.info(f'headers:{headers}')
         logging.info(f"headers_api:{headers['x-nxopen-api-key']}")
+        logging.info(f'api:{{var.value.apikey_openapi_nx}}')
 
         result = requests.get(self.URI, headers=headers)
         raw_data = result.json()
