@@ -29,12 +29,6 @@ class NxApiToJsonOperator(BaseOperator):
         pprint(raw_data)
 
         file_path = 'C:/Users/seoryeong/Desktop/folder/nx_code.json'
-        directory = os.path.dirname(file_path)
-
-        # Ensure the directory exists
-        os.makedirs(directory, exist_ok=True)
-
-        # Write the JSON data to the file
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(raw_data, f, ensure_ascii=False, indent=4)
         logging.info(f"JSON 데이터가 '{file_path}' 파일에 저장되었습니다.")
