@@ -23,7 +23,7 @@ class NxApiToJsonOperator(BaseOperator):
         connection = BaseHook.get_connection(self.http_conn_id)
         logging.info(f"connection:{connection}")
 
-        self.URI = f'{connection.host}/{self.endpoint}'
+        self.URI = f'{connection.host}{self.endpoint}'
 
         logging.info(f"URL: {self.URI}")
 
