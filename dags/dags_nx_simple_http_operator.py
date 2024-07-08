@@ -12,19 +12,28 @@ with DAG(
     dag_id='dags_nx_simple_http_operator',
     start_date=pendulum.datetime(2023,3,1,tz='Asia/Seoul'),
     catchup=False,
-    schedule=None
+    schedule_interval='* * * * *'
+
 ) as dag:
 
+    start_date = pendulum.datetime(2024, 5, 1, tz='Asia/Seoul')
+    end_date = pendulum.datetime(2024, 6, 1, tz='Asia/Seoul')
+
+    date = start_date
+
+    while date < end_date:
+        current_date_str = date.format('YYYY-MM-DD')
+
     nx_info = NxApiToJsonOperator(
-        task_id='nx_info',
+        task_id=f'nx_info_{current_date_str}',
         http_conn_id='nx_api',
-        endpoint='/maplestory/v1/ranking/overall?date=2024-05-01',
+        endpoint=f'/maplestory/v1/ranking/overall?date={current_date_str}',
     )
 
-    @task(task_id='python_2')
-    def python_2(**kwargs):
+    @task(task_id=f'python_{current_date_str}')
+    def python_task(**kwargs):
         ti = kwargs['ti']
-        rslt = ti.xcom_pull(task_ids='nx_info')
+        rslt = ti.xcom_pull(task_ids=f'nx_info_{current_date_str}')
 
         conn_str = Variable.get('connection_string')
         container_name = Variable.get('container_name')
@@ -32,8 +41,7 @@ with DAG(
         container_client = blob_service_client.get_container_client(container_name)
 
         raw_data = rslt
-        today_date = datetime.today()
-        filename = f"nx_extract_data-{today_date}.json"
+        filename = f"nx_extract_data-{current_date_str}.json"
 
         try:
             blob_client = container_client.get_blob_client(filename)
@@ -46,11 +54,9 @@ with DAG(
             return f"An error occurred while uploading to Blob Storage: {str(e)}"
 
 
+    nx_info >> python_task(current_date_str)
 
-
-
-
-    nx_info >> python_2()
+    date = date.add(days=1)
 
 
 
