@@ -28,7 +28,7 @@ class NxApiToJsonOperator(BaseOperator):
         logging.info(f"URL: {self.URI}")
 
         headers = {'accept':'application/json',
-                   'x-nxopen-api-key': '{{var.value.aapikey_openapi_nx}}'}
+                   'x-nxopen-api-key': '{{var.value.apikey_openapi_nx}}'}
 
         print(headers)
 
