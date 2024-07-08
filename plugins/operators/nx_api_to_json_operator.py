@@ -11,10 +11,10 @@ class NxApiToJsonOperator(BaseOperator):
 
     template_fields = ('endpoint', 'path', 'file_name', 'base_dt')
 
-    def __init__(self, http_conn_id, nx_endpoint, **kwargs):
+    def __init__(self, http_conn_id, endpoint, **kwargs):
         super().__init__(**kwargs)
         self.http_conn_id = http_conn_id
-        self.endpoint = nx_endpoint
+        self.endpoint = endpoint
 
     def execute(self, context):
 
