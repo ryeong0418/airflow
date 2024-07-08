@@ -27,22 +27,14 @@ class ExtractNxOperator(BaseOperator):
             raise ValueError("URI가 설정되지 않았습니다.")
 
         headers = {'x-nxopen-api-key': self.API_KEY}
-        try:
-            response = requests.get(self.URI, headers=headers)
-            response.raise_for_status()
-            raw_data = response.json()
-            pprint(raw_data)
+        result = requests.get(self.URI, headers=headers)
+        raw_data = result.json()
+        pprint(raw_data)
 
-            # Save the data to a JSON file
-            with open(self.FILE_PATH, 'w', encoding='utf-8') as f:
-                json.dump(raw_data, f, ensure_ascii=False, indent=4)
+        with open(self.FILE_PATH, 'w', encoding='utf-8') as f:
+            json.dump(raw_data, f, ensure_ascii=False, indent=4)
 
-            logging.info(f"JSON data has been saved to {self.FILE_PATH}.")
-            return raw_data
-
-        except requests.exceptions.RequestException as e:
-            logging.error(f"Request failed: {e}")
-            raise
+        return raw_data
 
 
     # def load_data(self):

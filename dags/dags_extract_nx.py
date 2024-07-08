@@ -11,12 +11,6 @@ import logging
 
 load_dotenv()  # .env 파일에서 환경 변수 로드
 
-# Logging environment variables for debugging
-logging.info(f"Loaded API_KEY: {os.getenv('API_KEY')}")
-logging.info(f"Loaded URI: {os.getenv('URI')}")
-logging.info(f"Loaded FILE_PATH: {os.getenv('FILE_PATH')}")
-
-
 with DAG(
     dag_id='dags_extract_nx',
     description='Fetch MapleStory data daily and save as JSON',
