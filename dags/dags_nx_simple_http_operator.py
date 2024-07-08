@@ -1,12 +1,11 @@
 from airflow import DAG
 from operators.nx_api_to_json_operator import NxApiToJsonOperator
-from airflow.operators.python import PythonOperator
 from azure.storage.blob import BlobServiceClient
 from airflow.decorators import task
 import pendulum
-import os
 import json
 from datetime import datetime
+from airflow.models import Variable
 
 
 with DAG(
@@ -26,10 +25,11 @@ with DAG(
     def python_2(**kwargs):
         ti = kwargs['ti']
         rslt = ti.xcom_pull(task_ids='nx_info')
-        print(rslt)
 
-        blob_service_client = BlobServiceClient.from_connection_string('DefaultEndpointsProtocol=https;AccountName=nxpro;AccountKey=DpkKa4WDxfHbD6TbUCyaRDYu1G838cOtDOaaLRZHQ6+a+AGjGOL6grqPpePhvJHT5SRjAvLecsC9+AStRJALvw==;EndpointSuffix=core.windows.net')
-        container_client = blob_service_client.get_container_client('nxcontainer')
+        conn_str = Variable.get('connection_string')
+        container_name = Variable.get('container_name')
+        blob_service_client = BlobServiceClient.from_connection_string(conn_str)
+        container_client = blob_service_client.get_container_client(container_name)
 
         raw_data = rslt
         today_date = datetime.today()
