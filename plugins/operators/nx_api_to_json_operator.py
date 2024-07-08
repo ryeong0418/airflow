@@ -21,9 +21,11 @@ class NxApiToJsonOperator(BaseOperator):
         logging.info(f"endpoint: {self.endpoint}")
 
         connection = BaseHook.get_connection(self.http_conn_id)
-        self.URL = f'{connection.host}/{self.endpoint}'
+        logging.info(f"connection:{connection}")
 
-        logging.info(f"endpoint: {self.URL}")
+        self.URI = f'{connection.host}/{self.endpoint}'
+
+        logging.info(f"URL: {self.URI}")
 
         headers = {'accept':'application/json',
                    'x-nxopen-api-key': '{{var.value.aapikey_openapi_nx}}'}
