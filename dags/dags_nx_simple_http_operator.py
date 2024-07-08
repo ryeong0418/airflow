@@ -14,9 +14,9 @@ with DAG(
     nx_info = SimpleHttpOperator(
         task_id='nx_info',
         http_conn_id='nx_api',
-        endpoint='{{var.value.apikey_openapi_nx}}/maplestory/v1/ranking/overall?date=2024-05-01',
+        endpoint='/maplestory/v1/ranking/overall?date=2024-05-01',
         method='GET',
-        headers={'x-nxopen-api-key': '{{ var.value.apikey_openapi_nx }}'},
+        headers={'x-nxopen-api-key': '{{var.value.apikey_openapi_nx}}'},
         response_filter=lambda response: response.json(),
         log_response=True
 
@@ -26,6 +26,7 @@ with DAG(
     def python_2(**kwargs):
         ti = kwargs['ti']
         rslt = ti.xcom_pull(task_ids='nx_info')
+        print(rslt)
         import json
         from pprint import pprint
 
