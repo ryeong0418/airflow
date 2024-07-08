@@ -4,6 +4,7 @@ import pandas as pd
 from pprint import pprint
 import logging
 import requests
+from airflow.models import Variable
 import json
 
 
@@ -27,7 +28,9 @@ class NxApiToJsonOperator(BaseOperator):
 
         logging.info(f"URL: {self.URI}")
 
-        headers = {'x-nxopen-api-key': '{{var.value.apikey_openapi_nx}}'}
+        #headers = {'x-nxopen-api-key': '{{var.value.apikey_openapi_nx}}'}
+        api_key = Variable.get("apikey_openapi_nx")
+        headers = {'x-nxopen-api-key': api_key}
 
         result = requests.get(self.URI, headers=headers)
         raw_data = result.json()
