@@ -8,6 +8,7 @@ from airflow.models import Variable
 import json
 import os
 
+
 class NxApiToJsonOperator(BaseOperator):
 
     def __init__(self, http_conn_id, endpoint, **kwargs):
@@ -27,12 +28,6 @@ class NxApiToJsonOperator(BaseOperator):
         result = requests.get(self.URI, headers=headers)
         raw_data = result.json()
         pprint(raw_data)
-
-        file_path = 'C:/Users/seoryeong/Desktop/folder/nx_code.json'
-        with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(raw_data, f, ensure_ascii=False, indent=4)
-        logging.info(f"JSON 데이터가 '{file_path}' 파일에 저장되었습니다.")
-
 
         return raw_data
 
