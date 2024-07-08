@@ -9,8 +9,6 @@ import json
 
 class NxApiToJsonOperator(BaseOperator):
 
-    template_fields = ('endpoint', 'path', 'file_name', 'base_dt')
-
     def __init__(self, http_conn_id, endpoint, **kwargs):
         super().__init__(**kwargs)
         self.http_conn_id = http_conn_id
@@ -20,8 +18,6 @@ class NxApiToJsonOperator(BaseOperator):
 
         # Logging for debugging
         logging.info(f"conn_id: {self.http_conn_id}")
-        logging.info(f"path: {self.path}")
-        logging.info(f"file_name: {self.file_name}")
         logging.info(f"endpoint: {self.endpoint}")
 
         connection = BaseHook.get_connection(self.http_conn_id)
