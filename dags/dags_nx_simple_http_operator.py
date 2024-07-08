@@ -1,7 +1,5 @@
 from airflow import DAG
-from airflow.operators.bash import BashOperator
-from airflow.providers.http.operators.http import SimpleHttpOperator
-from airflow.decorators import task
+from operators.nx_api_to_json_operator import NxApiToJsonOperator
 import pendulum
 
 with DAG(
@@ -11,25 +9,13 @@ with DAG(
     schedule=None
 ) as dag:
 
-    nx_info = SimpleHttpOperator(
+    nx_info = NxApiToJsonOperator(
         task_id='nx_info',
         http_conn_id='nx_api',
         endpoint='/maplestory/v1/ranking/overall?date=2024-05-01',
-        method='GET',
-        headers={'x-nxopen-api-key': '{{var.value.apikey_openapi_nx}}'},
-        response_filter=lambda response: response.json(),
-        log_response=True
-
     )
 
-    @task(task_id='python_2')
-    def python_2(**kwargs):
-        ti = kwargs['ti']
-        rslt = ti.xcom_pull(task_ids='nx_info')
-        print(rslt)
-        import json
-        from pprint import pprint
 
-        pprint(json.loads(rslt))
 
-    nx_info >> python_2()
+
+

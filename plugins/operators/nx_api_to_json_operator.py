@@ -11,13 +11,10 @@ class NxApiToJsonOperator(BaseOperator):
 
     template_fields = ('endpoint', 'path', 'file_name', 'base_dt')
 
-    def __init__(self, dataset_nm, path, file_name, base_dt=None, **kwargs):
+    def __init__(self, http_conn_id, nx_endpoint, **kwargs):
         super().__init__(**kwargs)
-        self.http_conn_id = 'nx_api'
-        self.path = path
-        self.file_name = file_name
-        self.endpoint = '{{var.value.apikey_openapi_nx}}/maplestory/v1/ranking/overall?date=2024-05-01'
-        self.base_dt = base_dt
+        self.http_conn_id = http_conn_id
+        self.endpoint = nx_endpoint
 
     def execute(self, context):
 
@@ -27,18 +24,20 @@ class NxApiToJsonOperator(BaseOperator):
         logging.info(f"file_name: {self.file_name}")
         logging.info(f"endpoint: {self.endpoint}")
 
-        if not self.URI:
-            raise ValueError("URI가 설정되지 않았습니다.")
-
         connection = BaseHook.get_connection(self.http_conn_id)
-        self.base_url = f'{connection.host}:{connection.port}/{self.endpoint}'
-        headers = {'x-nxopen-api-key': '{{var.value.aapikey_openapi_nx}}'}
-        print(headers)
-        # result = requests.get(self.URI, headers=headers)
-        # raw_data = result.json()
-        # pprint(raw_data)
+        self.URL = f'{connection.host}/{self.endpoint}'
 
-        # with open(self.FILE_PATH, 'w', encoding='utf-8') as f:
-        #     json.dump(raw_data, f, ensure_ascii=False, indent=4)
-        #
-        # return raw_data
+        logging.info(f"endpoint: {self.URL}")
+
+        headers = {'accept':'application/json',
+                   'x-nxopen-api-key': '{{var.value.aapikey_openapi_nx}}'}
+
+        print(headers)
+
+        result = requests.get(self.URI, headers=headers)
+        raw_data = result.json()
+        pprint(raw_data)
+
+        return raw_data
+
+
