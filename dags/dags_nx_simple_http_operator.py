@@ -8,6 +8,7 @@ import json
 from datetime import datetime
 from airflow.models import Variable
 
+
 def upload_to_blob_storage(date_str, **kwargs):
     ti = kwargs['ti']
     rslt = ti.xcom_pull(task_ids=f'nx_info_{date_str}')
