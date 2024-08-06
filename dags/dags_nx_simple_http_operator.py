@@ -39,8 +39,8 @@ with DAG(
 
 ) as dag:
 
-    start_date = pendulum.datetime(2024, 5, 1, tz='Asia/Seoul')
-    end_date = pendulum.datetime(2024, 6, 1, tz='Asia/Seoul')
+    start_date = pendulum.datetime(2024, 1, 1, tz='Asia/Seoul')
+    end_date = pendulum.datetime(2024, 6, 30, tz='Asia/Seoul')
     current_date = start_date
 
     while current_date < end_date:
